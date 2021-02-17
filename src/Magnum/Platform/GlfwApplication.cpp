@@ -797,8 +797,6 @@ constexpr Int CursorMap[] {
 }
 
 void GlfwApplication::setCursor(Cursor cursor) {
-    CORRADE_INTERNAL_ASSERT(UnsignedInt(cursor) < Containers::arraySize(_cursors));
-
     _cursor = cursor;
 
     if(cursor == Cursor::Hidden) {
@@ -810,6 +808,11 @@ void GlfwApplication::setCursor(Cursor cursor) {
     } else {
         glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
+
+    /* The second condition could be a static assert but it doesn't let me
+       because "this pointer only accessible in a constexpr function". Thanks
+       for nothing, C++. */
+    CORRADE_INTERNAL_ASSERT(UnsignedInt(cursor) < Containers::arraySize(_cursors) && Containers::arraySize(_cursors) == Containers::arraySize(CursorMap));
 
     if(!_cursors[UnsignedInt(cursor)])
         _cursors[UnsignedInt(cursor)] = glfwCreateStandardCursor(CursorMap[UnsignedInt(cursor)]);
